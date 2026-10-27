@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vision NG Project Dashboard</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --ink:#15181d; --dim:#6b7280; --line:#e3e6ea;
+  --accent:#1f3864; --ok:#137333; --warn:#b3261e; --soon:#8a6100;
+  --user:#1f3864; --int:#6d28d9; --patch:#9a3412; --none:#6b7280;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --bg:#0f1115; --panel:#171a20; --ink:#e7e9ee; --dim:#9aa3b2; --line:#272c35;
+  --accent:#9db8e8; --ok:#5dd47f; --warn:#ff8b80; --soon:#e5b567;
+  --user:#9db8e8; --int:#c4b5fd; --patch:#fdba74; --none:#9aa3b2;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1115; --panel:#171a20; --ink:#e7e9ee; --dim:#9aa3b2; --line:#272c35;
+  --accent:#9db8e8; --ok:#5dd47f; --warn:#ff8b80; --soon:#e5b567;
+  --user:#9db8e8; --int:#c4b5fd; --patch:#fdba74; --none:#9aa3b2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:1500px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+h1{font-size:24px;margin:0;letter-spacing:-.2px}
+.ref{color:var(--dim);font-size:12.5px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 20px}
+.cards{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 26px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:150px;flex:1 1 150px}
+.card-h{font-weight:700;font-size:13px;letter-spacing:.3px}
+.card-s{color:var(--dim);font-size:12px;margin-top:6px}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;background:var(--accent)}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+nav a{background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 13px;
+  text-decoration:none;color:var(--ink);font-size:13px}
+nav a:hover{border-color:var(--accent)}
+.pagenav{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 10px}
+.pbtn{background:var(--accent);color:var(--panel);border-radius:7px;padding:6px 14px;text-decoration:none;font-size:13px;font-weight:600}
+.pbtn:hover{opacity:.85}
+.pbtn.sm{padding:3px 10px;font-size:12px;margin-left:6px}
+button.pbtn{border:0;cursor:pointer;font-family:inherit}
+#planning:not(.show-active) tr.plan-active{display:none}
+section{margin:0 0 34px}
+h2{font-size:16.5px;margin:0 0 3px;display:flex;align-items:center;gap:9px}
+.count{background:var(--accent);color:var(--panel);border-radius:99px;font-size:11.5px;
+  padding:1px 9px;font-weight:700}
+.note{color:var(--dim);font-size:12.5px;margin:0 0 11px}
+.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+th{background:var(--bg);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--dim);position:sticky;top:0;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+td.num,th.num{text-align:right}
+.name{white-space:normal;min-width:180px;display:inline-block}
+a{color:var(--accent)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+.dim{color:var(--dim)}
+.ok{color:var(--ok)} .warn{color:var(--warn)}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11.5px;font-weight:600;
+  border:1px solid currentColor}
+.tag-user{color:var(--user)} .tag-int{color:var(--int)} .tag-patch{color:var(--patch)}
+.tag-none{color:var(--none);font-weight:400;font-style:italic}
+.pill{display:inline-block;padding:0 7px;border-radius:99px;font-size:11px;font-weight:700;
+  border:1px solid currentColor;margin-left:5px}
+.pill.ok{color:var(--ok)} .pill.late{color:var(--warn)} .pill.soon{color:var(--soon)}
+.nowrap{white-space:nowrap}
+.mv{font-size:12px;font-weight:700;margin-left:4px;cursor:help}
+.mv.up{color:var(--ok)} .mv.dn{color:var(--warn)} .mv.zero{opacity:.35}
+.st{font-weight:600}
+.st-in-qa-bsa{color:var(--soon)} .st-in-qa-dev{color:var(--soon)}
+.st-in-uat{color:var(--accent)} .st-ready-for-deployment{color:var(--ok)}
+.st-on-hold,.st-backlog{color:var(--dim)}
+.empty{color:var(--dim);text-align:center;padding:20px}
+.framehint{display:none;margin:12px 0 0;border:1px solid var(--warn);border-radius:9px;padding:11px 14px;font-size:13px}
+.framehint.on{display:block}
+.fhrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.framehint input{flex:1 1 320px;min-width:0;background:var(--bg);color:var(--ink);
+  border:1px solid var(--line);border-radius:6px;padding:6px 8px;
+  font:11.5px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.framehint .msg{font-size:12.5px;color:var(--dim)}
+.manual{display:none;margin:14px 0 0;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.manual.on{display:block}
+.manual h3{margin:0 0 4px;font-size:14px}
+.manual p{margin:0 0 9px;font-size:12.5px;color:var(--dim)}
+.manual textarea{width:100%;height:150px;box-sizing:border-box;background:var(--bg);color:var(--ink);
+  border:1px solid var(--line);border-radius:7px;padding:9px;resize:vertical;
+  font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.manual .row{margin-top:9px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.manual .msg{font-size:12.5px;color:var(--dim)}
+.manual .dl{font-size:12.5px;color:var(--accent)}
+footer{color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:34px}
+.stale{margin-top:8px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:600;background:#5c2018;color:#ffd9d2;border:1px solid #8c3227}
+.stale.warn{background:#5c4a18;color:#ffeccc;border-color:#8c7127}
+@media print{body{background:#fff}nav,.cards,.pagenav,.pbtn{display:none}.tw{border:0}th{position:static}}
+</style></head>
+<body><div class="wrap">
+<header>
+  <h1>Vision NG Project Dashboard</h1>
+  <div class="ref" id="reftime" data-gen="2026-10-27T16:31:52.541Z">Last refreshed Tuesday, October 27, 2026 at 9:31 AM PT</div>
+  <div id="stale" class="stale" hidden></div>
+</header>
+<div class="pagenav"><a class="pbtn" href="Vision%20NG%20Project%20Management.html">&#8962; Home</a><a class="pbtn" href="Vision%20NG%20Metric%20Analysis.html">Metric Analysis</a></div>
+<p class="sub">48 active windows &middot; sourced from Jira VISAR-6166 / VISAR-7396, the Pipeline Plan and the QA defect logs.</p>
+
+<div class="cards"><div class="card"><div class="card-h">SG1</div>
+    <div class="bar"><i style="width:100%"></i></div>
+    <div class="card-s">11 of 11 ready</div></div><div class="card"><div class="card-h">SG2</div>
+    <div class="bar"><i style="width:9%"></i></div>
+    <div class="card-s">1 of 11 ready</div></div><div class="card"><div class="card-h">SG3</div>
+    <div class="bar"><i style="width:0%"></i></div>
+    <div class="card-s">0 of 4 ready</div></div><div class="card"><div class="card-h">SG4</div>
+    <div class="bar"><i style="width:0%"></i></div>
+    <div class="card-s">0 of 8 ready</div></div><div class="card"><div class="card-h">SG5</div>
+    <div class="bar"><i style="width:0%"></i></div>
+    <div class="card-s">0 of 3 ready</div></div><div class="card"><div class="card-h">SG6</div>
+    <div class="bar"><i style="width:0%"></i></div>
+    <div class="card-s">0 of 5 ready</div></div><div class="card"><div class="card-h">SG7</div>
+    <div class="bar"><i style="width:0%"></i></div>
+    <div class="card-s">0 of 5 ready</div></div><div class="card"><div class="card-h">SG8</div>
+    <div class="bar"><i style="width:0%"></i></div>
+    <div class="card-s">0 of 7 ready</div></div></div>
+
+<nav><a href="#uatmit">UAT Mitigation</a><a href="#uat">Sent to UAT</a><a href="#committed">Committed Delivery Windows (Timer On)</a><a href="#inflight-dev">In Flight - Dev</a><a href="#inflight-bsa">In Flight - BSA</a><a href="#deploy">To Be Deployed</a><a href="#planning">Sprint Planning</a><a href="#completed">Completed</a></nav>
+
+<section id="uatmit">
+  <h2>UAT Mitigation <span class="count">4</span></h2>
+  <p class="note">UAT defects owed a fix. One UAT subtask per dev subtask: Dev fixes, BSA runs QA, then the PDC confirms with the SMEs and closes it.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>UAT Subtask</th><th>W#</th><th>UAT Start</th><th>Window / Subscreen Name</th><th>UAT Status</th><th>QA VISAR</th><th>Dev</th><th>BSA</th><th>Open UAT Def</th><th>Defect Log</th><th>UAT Log</th><th class="noteh">Notes</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7545" target="_blank" rel="noopener">VISAR-7545</a></td><td><span class="mono">10</span></td><td>2026-10-19</td><td><span class="name">Calendar Transfer</span></td><td><span class="st st-in-uat">In UAT</span></td><td><span class="dim">—</span></td><td>CN</td><td>DC</td><td><span class="nowrap"><span class="ok">0</span> <span class="mv up" title="Since UAT Start 2026-10-19: 1 UAT defect(s) added, 1 closed">&#9650;1</span> <span class="mv dn" title="Since UAT Start 2026-10-19: 1 UAT defect(s) added, 1 closed">&#9660;1</span></span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Calendar%20Transfer.xlsx" target="_blank" rel="noopener">log</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td><td class="notecell"><textarea class="note-in" data-id="UAT-W10" data-key="VISAR-7545" data-w="10" data-name="Calendar Transfer" data-section="UAT Mitigation" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7582" target="_blank" rel="noopener">VISAR-7582</a></td><td><span class="mono">13</span></td><td>2026-10-19</td><td><span class="name">Court Trial Transfer</span></td><td><span class="st st-subtask-in-progress">Subtask In-Progress</span></td><td><span class="dim">—</span></td><td>CN</td><td>DC</td><td><span class="nowrap"><b class="warn">1</b> <span class="mv up" title="Since UAT Start 2026-10-19: 1 UAT defect(s) added, 0 closed">&#9650;1</span> <span class="mv zero" title="Since UAT Start 2026-10-19: 1 UAT defect(s) added, 0 closed">&#9660;0</span></span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Court%20Trial%20Transfer.xlsx" target="_blank" rel="noopener">log</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td><td class="notecell"><textarea class="note-in" data-id="UAT-W13" data-key="VISAR-7582" data-w="13" data-name="Court Trial Transfer" data-section="UAT Mitigation" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7498" target="_blank" rel="noopener">VISAR-7498</a></td><td><span class="mono">53</span></td><td>2026-10-06</td><td><span class="name">Minutes</span></td><td><span class="st st-in-uat">In UAT</span></td><td><span class="dim">—</span></td><td>SM</td><td>BY</td><td><span class="nowrap"><b class="warn">1</b> <span class="mv up" title="Since UAT Start 2026-10-06: 7 UAT defect(s) added, 6 closed">&#9650;7</span> <span class="mv dn" title="Since UAT Start 2026-10-06: 7 UAT defect(s) added, 6 closed">&#9660;6</span></span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Minutes.xlsx" target="_blank" rel="noopener">log</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td><td class="notecell"><textarea class="note-in" data-id="UAT-W53" data-key="VISAR-7498" data-w="53" data-name="Minutes" data-section="UAT Mitigation" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7498" target="_blank" rel="noopener">VISAR-7498</a></td><td><span class="mono">53.3</span></td><td>2026-10-06</td><td><span class="name">VCJIS - Court Reports Preview</span></td><td><span class="st st-in-uat">In UAT</span></td><td><span class="dim">—</span></td><td>SM</td><td>BY</td><td><span class="nowrap"><b class="warn">1</b> <span class="mv up" title="Since UAT Start 2026-10-06: 7 UAT defect(s) added, 6 closed">&#9650;7</span> <span class="mv dn" title="Since UAT Start 2026-10-06: 7 UAT defect(s) added, 6 closed">&#9660;6</span></span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Minutes.xlsx" target="_blank" rel="noopener">log</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td><td class="notecell"><textarea class="note-in" data-id="UAT-W53.3" data-key="VISAR-7498" data-w="53.3" data-name="VCJIS - Court Reports Preview" data-section="UAT Mitigation" rows="1" placeholder="note…"></textarea></td></tr></tbody>
+  </table></div>
+</section>
+<section id="uat">
+  <h2>Sent to UAT <span class="count">6</span></h2>
+  <p class="note">User-facing work in UAT. Once signed off (Ready for Deployment) it moves to To Be Deployed.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>To UAT</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th><th>UAT Start</th><th>UAT Subtask</th><th>Defect Log</th><th class="noteh">Notes</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7421" target="_blank" rel="noopener">VISAR-7421</a></td><td><span class="mono">9</span></td><td>2026-10-23 <span class="pill ok">3d early</span></td><td><span class="name">Calendar Report</span></td><td>NV</td><td>CL</td><td><span class="dim">not started</span></td><td><span class="dim">—</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Calendar%20Report.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W9" data-key="VISAR-7421" data-w="9" data-name="Calendar Report" data-section="Sent to UAT" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7422" target="_blank" rel="noopener">VISAR-7422</a></td><td><span class="mono">9.1</span></td><td>2026-10-23 <span class="pill ok">3d early</span></td><td><span class="name">Calendar Batch Print</span></td><td>NV</td><td>CL</td><td><span class="dim">not started</span></td><td><span class="dim">—</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Calendar%20Batch%20Print.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W9.1" data-key="VISAR-7422" data-w="9.1" data-name="Calendar Batch Print" data-section="Sent to UAT" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7401" target="_blank" rel="noopener">VISAR-7401</a></td><td><span class="mono">10</span></td><td>2026-10-02 <span class="pill ok">11d early</span></td><td><span class="name">Calendar Transfer</span></td><td>CN</td><td>DC</td><td>2026-10-19</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7545" target="_blank" rel="noopener">VISAR-7545</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Calendar%20Transfer.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W10" data-key="VISAR-7401" data-w="10" data-name="Calendar Transfer" data-section="Sent to UAT" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7426" target="_blank" rel="noopener">VISAR-7426</a></td><td><span class="mono">13</span></td><td>2026-10-08 <span class="pill ok">12d early</span></td><td><span class="name">Court Trial Transfer</span></td><td>CN</td><td>DC</td><td>2026-10-19</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7582" target="_blank" rel="noopener">VISAR-7582</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Court%20Trial%20Transfer.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W13" data-key="VISAR-7426" data-w="13" data-name="Court Trial Transfer" data-section="Sent to UAT" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6315" target="_blank" rel="noopener">VISAR-6315</a></td><td><span class="mono">53</span></td><td>2026-07-16 <span class="pill ok">78d early</span></td><td><span class="name">Minutes</span></td><td>SM</td><td>BY</td><td>2026-10-06</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7498" target="_blank" rel="noopener">VISAR-7498</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Minutes.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W53" data-key="VISAR-6315" data-w="53" data-name="Minutes" data-section="Sent to UAT" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6315" target="_blank" rel="noopener">VISAR-6315</a></td><td><span class="mono">53.3</span></td><td>2026-07-16 <span class="pill ok">78d early</span></td><td><span class="name">VCJIS - Court Reports Preview</span></td><td>SM</td><td>BY</td><td>2026-10-06</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7498" target="_blank" rel="noopener">VISAR-7498</a></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Minutes.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W53.3" data-key="VISAR-6315" data-w="53.3" data-name="VCJIS - Court Reports Preview" data-section="Sent to UAT" rows="1" placeholder="note…"></textarea></td></tr></tbody>
+  </table></div>
+</section>
+<section id="committed">
+  <h2>Committed Delivery Windows (Timer On) <span class="count">2</span></h2>
+  <p class="note">Two-week countdown running. Target Date shows days remaining.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Target Date to UAT</th><th>Window / Subscreen Name</th><th>Status</th><th class="num">QA Cycle</th><th>QA Subtask</th><th>Grouping</th><th>Dev</th><th>BSA</th><th class="num">Open Def</th><th>Defect Log</th><th class="noteh">Notes</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7427" target="_blank" rel="noopener">VISAR-7427</a></td><td><span class="mono">14</span></td><td>2026-11-05 <span class="pill ok">D-9</span></td><td><span class="name">Notice of Packaged Hearings</span></td><td><span class="st st-in-qa-dev">In QA - Dev</span></td><td class="num">1</td><td><span class="dim">—</span></td><td>Low High</td><td>CN</td><td>CL</td><td class="num"><b class="warn">8</b></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Notice%20of%20Packaged%20Hearings.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W14" data-key="VISAR-7427" data-w="14" data-name="Notice of Packaged Hearings" data-section="Committed Delivery Windows (Timer On)" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7445" target="_blank" rel="noopener">VISAR-7445</a></td><td><span class="mono">104</span></td><td>2026-11-05 <span class="pill ok">D-9</span></td><td><span class="name">Case File Purge</span></td><td><span class="st st-in-qa-dev">In QA - Dev</span></td><td class="num">2</td><td><span class="dim">—</span></td><td>Medium</td><td>SM</td><td>BY</td><td class="num"><b class="warn">15</b></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Case%20File%20Purge.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W104" data-key="VISAR-7445" data-w="104" data-name="Case File Purge" data-section="Committed Delivery Windows (Timer On)" rows="1" placeholder="note…"></textarea></td></tr></tbody>
+  </table></div>
+</section>
+<section id="inflight-dev">
+  <h2>In Flight - Dev <span class="count">10</span></h2>
+  <p class="note">With the developer, before the two-week UAT countdown: In Development, In QA - Dev (defects back with Dev), On Hold and Backlog.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Menu Group</th><th>Window / Subscreen Name</th><th>Status</th><th class="num">QA Cycle</th><th>QA Subtask</th><th>Grouping</th><th>Dev</th><th>BSA</th><th class="num">Open Def</th><th class="num">Est LOE (d)</th><th>Defect Log</th><th class="noteh">Notes</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-int">Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7312" target="_blank" rel="noopener">VISAR-7312</a></td><td><span class="mono">1</span></td><td>1 - ADMIN</td><td><span class="name">Auto Process Schedule</span></td><td><span class="st st-in-development">In Development</span></td><td class="num">1</td><td><span class="dim">—</span></td><td>Low High</td><td>JC</td><td>BY</td><td class="num"><b class="warn">7</b></td><td class="num">13</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Auto%20Process%20Schedule.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W1" data-key="VISAR-7312" data-w="1" data-name="Auto Process Schedule" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-int">Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7368" target="_blank" rel="noopener">VISAR-7368</a></td><td><span class="mono">123</span></td><td>20 - TABLES</td><td><span class="name">Agency Codes</span></td><td><span class="st st-on-hold">On Hold</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Low</td><td>NV</td><td>BY</td><td class="num"><span class="ok">0</span></td><td class="num">5.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Agency%20Codes.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W123" data-key="VISAR-7368" data-w="123" data-name="Agency Codes" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-int">Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7311" target="_blank" rel="noopener">VISAR-7311</a></td><td><span class="mono">131</span></td><td>20 - TABLES</td><td><span class="name">Court Holidays</span></td><td><span class="st st-in-qa-dev">In QA - Dev</span></td><td class="num">2</td><td><span class="dim">—</span></td><td>Low High</td><td>CN</td><td>BY</td><td class="num"><b class="warn">12</b></td><td class="num">13</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Court%20Holidays.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W131" data-key="VISAR-7311" data-w="131" data-name="Court Holidays" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-int">Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7382" target="_blank" rel="noopener">VISAR-7382</a></td><td><span class="mono">147</span></td><td>20 - TABLES</td><td><span class="name">Unit Codes</span></td><td><span class="st st-backlog">Backlog</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Medium</td><td>SM</td><td>CL</td><td class="num"><span class="ok">0</span></td><td class="num">18.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Unit%20Codes.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W147" data-key="VISAR-7382" data-w="147" data-name="Unit Codes" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7419" target="_blank" rel="noopener">VISAR-7419</a></td><td><span class="mono">8</span></td><td>3 - CALENDARING</td><td><span class="name">Calendar List</span></td><td><span class="st st-in-development">In Development</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Medium</td><td>NV</td><td>BY</td><td class="num"><span class="ok">0</span></td><td class="num">18.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Calendar%20List.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W8" data-key="VISAR-7419" data-w="8" data-name="Calendar List" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7420" target="_blank" rel="noopener">VISAR-7420</a></td><td><span class="mono">8.1</span></td><td>3 - CALENDARING</td><td><span class="name">Post-Conviction Worksheet Report</span></td><td><span class="st st-in-development">In Development</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Medium</td><td>NV</td><td>BY</td><td class="num"><span class="ok">0</span></td><td class="num">18.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Post-Conviction%20Worksheet%20Report.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W8.1" data-key="VISAR-7420" data-w="8.1" data-name="Post-Conviction Worksheet Report" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7443" target="_blank" rel="noopener">VISAR-7443</a></td><td><span class="mono">102</span></td><td>16 - RECORDS</td><td><span class="name">Batch Purge</span></td><td><span class="st st-in-development">In Development</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Medium</td><td>SM</td><td><span class="dim">—</span></td><td class="num"><span class="ok">0</span></td><td class="num">18.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Batch%20Purge.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W102" data-key="VISAR-7443" data-w="102" data-name="Batch Purge" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7450" target="_blank" rel="noopener">VISAR-7450</a></td><td><span class="mono">108</span></td><td>16 - RECORDS</td><td><span class="name">File Request Maintenance</span></td><td><span class="st st-in-development">In Development</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Low High</td><td>CN</td><td><span class="dim">—</span></td><td class="num"><span class="ok">0</span></td><td class="num">13</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20File%20Request%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W108" data-key="VISAR-7450" data-w="108" data-name="File Request Maintenance" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-none">unplanned</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6907" target="_blank" rel="noopener">VISAR-6907</a></td><td><span class="mono">33</span></td><td>5 - COLLECTIONS</td><td><span class="name">FTBCOD Interface</span></td><td><span class="st st-on-hold">On Hold</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>High</td><td>NV</td><td>CC</td><td class="num"><span class="ok">0</span></td><td class="num">31</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20FTBCOD%20Interface.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W33" data-key="VISAR-6907" data-w="33" data-name="FTBCOD Interface" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-none">unplanned</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7388" target="_blank" rel="noopener">VISAR-7388</a></td><td><span class="mono">130.1</span></td><td>20 - TABLES</td><td><span class="name">MOCS Docket Definition</span></td><td><span class="st st-on-hold">On Hold</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td><td>Medium</td><td>JC</td><td><span class="dim">—</span></td><td class="num"><span class="ok">0</span></td><td class="num">18.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20MOCS%20Docket%20Definition.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W130.1" data-key="VISAR-7388" data-w="130.1" data-name="MOCS Docket Definition" data-section="In Flight - Dev" rows="1" placeholder="note…"></textarea></td></tr></tbody>
+  </table></div>
+</section>
+<section id="inflight-bsa">
+  <h2>In Flight - BSA <span class="count">4</span></h2>
+  <p class="note">With the BSA for QA testing (In QA - BSA), before the two-week UAT countdown.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Menu Group</th><th>Window / Subscreen Name</th><th>Status</th><th class="num">QA Cycle</th><th>QA Subtask</th><th>Grouping</th><th>Dev</th><th>BSA</th><th class="num">Open Def</th><th class="num">Est LOE (d)</th><th>Defect Log</th><th class="noteh">Notes</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-int">Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7296" target="_blank" rel="noopener">VISAR-7296</a></td><td><span class="mono">124</span></td><td>20 - TABLES</td><td><span class="name">Agency X-Ref Maintenance</span></td><td><span class="st st-in-qa-bsa">In QA - BSA</span></td><td class="num">2</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7548" target="_blank" rel="noopener" title="Subtask In-Progress">VISAR-7548</a></td><td>Low High</td><td>CN</td><td>BY</td><td class="num"><b class="warn">1</b></td><td class="num">13</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Agency%20X-Ref%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W124" data-key="VISAR-7296" data-w="124" data-name="Agency X-Ref Maintenance" data-section="In Flight - BSA" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7444" target="_blank" rel="noopener">VISAR-7444</a></td><td><span class="mono">103</span></td><td>16 - RECORDS</td><td><span class="name">Calendar File Location</span></td><td><span class="st st-in-qa-bsa">In QA - BSA</span></td><td class="num">1</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7547" target="_blank" rel="noopener" title="Subtask In-Progress">VISAR-7547</a></td><td>Medium</td><td>CN</td><td>DC</td><td class="num"><span class="ok">0</span></td><td class="num">18.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Calendar%20File%20Location.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W103" data-key="VISAR-7444" data-w="103" data-name="Calendar File Location" data-section="In Flight - BSA" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7447" target="_blank" rel="noopener">VISAR-7447</a></td><td><span class="mono">105.1</span></td><td>16 - RECORDS</td><td><span class="name">Location History</span></td><td><span class="st st-in-qa-bsa">In QA - BSA</span></td><td class="num">1</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7546" target="_blank" rel="noopener" title="Subtask In-Progress">VISAR-7546</a></td><td>Low</td><td>CN</td><td>DC</td><td class="num"><span class="ok">0</span></td><td class="num">5.5</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Location%20History.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W105.1" data-key="VISAR-7447" data-w="105.1" data-name="Location History" data-section="In Flight - BSA" rows="1" placeholder="note…"></textarea></td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7544" target="_blank" rel="noopener">VISAR-7544</a></td><td><span class="mono">73</span></td><td>11 - FISCAL MAINTENANCE</td><td><span class="name">Cost of Collections</span></td><td><span class="st st-in-qa-bsa">In QA - BSA</span></td><td class="num">1</td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7554" target="_blank" rel="noopener" title="Subtask Created">VISAR-7554</a></td><td>Low High</td><td>KH</td><td>DC</td><td class="num"><span class="ok">0</span></td><td class="num">13</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Cost%20of%20Collections.xlsx" target="_blank" rel="noopener">log</a></td><td class="notecell"><textarea class="note-in" data-id="W73" data-key="VISAR-7544" data-w="73" data-name="Cost of Collections" data-section="In Flight - BSA" rows="1" placeholder="note…"></textarea></td></tr></tbody>
+  </table></div>
+</section>
+<section id="deploy">
+  <h2>To Be Deployed <span class="count">0</span></h2>
+  <p class="note">Ready for Deployment, grouped by the sprint it ships with. User work arrives after UAT sign-off; Internal and Patch work comes straight from QA.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Deploy With</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th><th>Signed Off</th><th class="noteh">Notes</th></tr></thead>
+    <tbody><tr><td colspan="9" class="empty">No windows in this section.</td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="planning">
+  <h2>Sprint Planning <span class="count">35</span>
+    <a class="pbtn sm" href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20Sprint%20Planning.xlsx?web=1" target="_blank" rel="noopener">Open Sprint Planning in Excel</a>
+    <button type="button" class="pbtn sm" id="planActive" onclick="var s=document.getElementById('planning'),on=s.classList.toggle('show-active');this.textContent=(on?'Hide':'Show')+' Active (9)'">Show Active (9)</button></h2>
+  <p class="note">Read-only view of the Sprint Planning worksheet. Sprint #, Dev, BSA and LOE are entered in the worksheet, not here.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>Subtask Status</th><th>W#</th><th>Menu Group</th><th>Window / Subscreen Name</th><th>Object Name</th><th>Grouping</th><th>Dev</th><th>BSA</th><th class="num">Dev Lead LOE (d)</th></tr></thead>
+    <tbody><tr class="plan-active"><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7419" target="_blank" rel="noopener">VISAR-7419</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">8</span></td><td>3 - CALENDARING</td><td><span class="name">Calendar List</span></td><td><span class="mono dim">w_ct_m_cal_list</span></td><td>Medium</td><td>NV</td><td>BY</td><td class="num">25</td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7420" target="_blank" rel="noopener">VISAR-7420</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">8.1</span></td><td>3 - CALENDARING</td><td><span class="name">Post-Conviction Worksheet Report</span></td><td><span class="mono dim">w_ct_r_pcw</span></td><td>Medium</td><td>NV</td><td>BY</td><td class="num">15</td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7443" target="_blank" rel="noopener">VISAR-7443</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">102</span></td><td>16 - RECORDS</td><td><span class="name">Batch Purge</span></td><td><span class="mono dim">w_ct_m_purged_cases</span></td><td>Medium</td><td>SM</td><td><span class="dim">—</span></td><td class="num">8</td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7444" target="_blank" rel="noopener">VISAR-7444</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">103</span></td><td>16 - RECORDS</td><td><span class="name">Calendar File Location</span></td><td><span class="mono dim">w_ct_s_rcds_cal_loc</span></td><td>Medium</td><td>CN</td><td>DC</td><td class="num">10</td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7445" target="_blank" rel="noopener">VISAR-7445</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">104</span></td><td>16 - RECORDS</td><td><span class="name">Case File Purge</span></td><td><span class="mono dim">w_ct_m_case_file_purge</span></td><td>Medium</td><td>SM</td><td>BY</td><td class="num">8</td></tr>
+<tr><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7454" target="_blank" rel="noopener">VISAR-7454</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">111</span></td><td>16 - RECORDS</td><td><span class="name">Missing Complaints Purge</span></td><td><span class="mono dim">w_ct_m_missing_complaints_purge</span></td><td>Medium</td><td>SM</td><td><span class="dim">—</span></td><td class="num">8</td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7446" target="_blank" rel="noopener">VISAR-7446</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">105</span></td><td>16 - RECORDS</td><td><span class="name">File Location</span></td><td><span class="mono dim">w_ct_s_rcds_location</span></td><td>Low High</td><td>CN</td><td><span class="dim">—</span></td><td class="num">8</td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7447" target="_blank" rel="noopener">VISAR-7447</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">105.1</span></td><td>16 - RECORDS</td><td><span class="name">Location History</span></td><td><span class="mono dim">w_ct_s_rcds_location_history</span></td><td>Low</td><td>CN</td><td>DC</td><td class="num">4</td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7448" target="_blank" rel="noopener">VISAR-7448</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">106</span></td><td>16 - RECORDS</td><td><span class="name">File Request</span></td><td><span class="mono dim">w_ct_s_rcds_request</span></td><td>Low High</td><td>SM</td><td><span class="dim">—</span></td><td class="num">5</td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7449" target="_blank" rel="noopener">VISAR-7449</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">107</span></td><td>16 - RECORDS</td><td><span class="name">File Request Inquiry</span></td><td><span class="mono dim">w_ct_s_rcds_request_inquiry</span></td><td>Low</td><td>SM</td><td><span class="dim">—</span></td><td class="num">5</td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7450" target="_blank" rel="noopener">VISAR-7450</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">108</span></td><td>16 - RECORDS</td><td><span class="name">File Request Maintenance</span></td><td><span class="mono dim">w_ct_s_rcds_request_maint</span></td><td>Low High</td><td>CN</td><td><span class="dim">—</span></td><td class="num">5</td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7451" target="_blank" rel="noopener">VISAR-7451</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">109</span></td><td>16 - RECORDS</td><td><span class="name">Image Maintenance</span></td><td><span class="mono dim">w_ct_m_case_docket_image</span></td><td>Medium</td><td>NV</td><td>BY</td><td class="num">8</td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7452" target="_blank" rel="noopener">VISAR-7452</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">109.1</span></td><td>16 - RECORDS</td><td><span class="name">Docket Code Lookup</span></td><td><span class="mono dim">w_ct_r_case_docket</span></td><td>Low</td><td>NV</td><td>BY</td><td class="num">5</td></tr>
+<tr><td><span class="tag tag-user">SG4</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7453" target="_blank" rel="noopener">VISAR-7453</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">110</span></td><td>16 - RECORDS</td><td><span class="name">Image Viewer</span></td><td><span class="mono dim">w_ct_m_image_viewer</span></td><td>Medium</td><td>NV</td><td>BY</td><td class="num">0.5</td></tr>
+<tr><td><span class="tag tag-user">SG5</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7557" target="_blank" rel="noopener">VISAR-7557</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">17</span></td><td>4 - CASE</td><td><span class="name">Case Summary</span></td><td><span class="mono dim">w_ct_m_case_summary</span></td><td>Medium High</td><td>SM</td><td><span class="dim">—</span></td><td class="num">26</td></tr>
+<tr><td><span class="tag tag-user">SG5</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7580" target="_blank" rel="noopener">VISAR-7580</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">17.1</span></td><td>4 - CASE</td><td><span class="name">Close Elig? Button</span></td><td><span class="mono dim">w_ct_r_case_closure_eligible</span></td><td>Low High</td><td>SM</td><td><span class="dim">—</span></td><td class="num">5</td></tr>
+<tr><td><span class="tag tag-user">SG5</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7563" target="_blank" rel="noopener">VISAR-7563</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">17.2</span></td><td>4 - CASE</td><td><span class="name">Bail Schedule Maintenance Response</span></td><td><span class="mono dim">w_ct_r_fscl_bail_sched_maint_response</span></td><td>Low High</td><td>SM</td><td>BY</td><td class="num">0.5</td></tr>
+<tr><td><span class="tag tag-user">SG6</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7564" target="_blank" rel="noopener">VISAR-7564</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">72</span></td><td>11 - FISCAL MAINTENANCE</td><td><span class="name">Chart of Accounts</span></td><td><span class="mono dim">w_ct_m_fscl_chart_of_accts</span></td><td>Low</td><td>CN</td><td><span class="dim">—</span></td><td class="num">5</td></tr>
+<tr><td><span class="tag tag-user">SG6</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7567" target="_blank" rel="noopener">VISAR-7567</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">77</span></td><td>11 - FISCAL MAINTENANCE</td><td><span class="name">PA Distribution Xref</span></td><td><span class="mono dim">w_ct_m_fscl_dist_xref</span></td><td>Low</td><td>NV</td><td><span class="dim">—</span></td><td class="num">7</td></tr>
+<tr><td><span class="tag tag-user">SG6</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7574" target="_blank" rel="noopener">VISAR-7574</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">150</span></td><td>21 - WARRANTS</td><td><span class="name">Pending Warrant Review</span></td><td><span class="mono dim">w_ct_m_warrant_review</span></td><td>Medium</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG6</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7575" target="_blank" rel="noopener">VISAR-7575</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">151</span></td><td>21 - WARRANTS</td><td><span class="name">Warrant Image Viewer</span></td><td><span class="mono dim">w_ct_m_warrant_images</span></td><td>Low High</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG6</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7576" target="_blank" rel="noopener">VISAR-7576</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">152</span></td><td>21 - WARRANTS</td><td><span class="name">Warrant Maintenance</span></td><td><span class="mono dim">w_ct_m_warrant_signal_mon</span></td><td>Medium</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG7</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7565" target="_blank" rel="noopener">VISAR-7565</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">74</span></td><td>11 - FISCAL MAINTENANCE</td><td><span class="name">Fee Distribution Schedule</span></td><td><span class="mono dim">w_ct_m_fscl_fee_dist_sched</span></td><td>Low High</td><td>NV</td><td><span class="dim">—</span></td><td class="num">10</td></tr>
+<tr><td><span class="tag tag-user">SG7</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7566" target="_blank" rel="noopener">VISAR-7566</a></td><td><span class="pill soon">Ready</span></td><td><span class="mono">75</span></td><td>11 - FISCAL MAINTENANCE</td><td><span class="name">Fund Maintenance</span></td><td><span class="mono dim">w_ct_m_fscl_fund_maint</span></td><td>Low High</td><td>NV</td><td><span class="dim">—</span></td><td class="num">8</td></tr>
+<tr><td><span class="tag tag-user">SG7</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7577" target="_blank" rel="noopener">VISAR-7577</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">153</span></td><td>21 - WARRANTS</td><td><span class="name">Warrant Maintenance (CTS) (Warrant Signal Audit)</span></td><td><span class="mono dim">w_ct_m_warrant_signal_audit</span></td><td>Medium</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG7</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7578" target="_blank" rel="noopener">VISAR-7578</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">154</span></td><td>21 - WARRANTS</td><td><span class="name">Warrant Reports</span></td><td><span class="mono dim">w_ct_r_main_report</span></td><td>Medium</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG7</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7579" target="_blank" rel="noopener">VISAR-7579</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">155</span></td><td>21 - WARRANTS</td><td><span class="name">Warrant XML Viewer (CTS)</span></td><td><span class="mono dim">w_ct_m_warrant_awss_xml</span></td><td>Low High</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr class="plan-active"><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7544" target="_blank" rel="noopener">VISAR-7544</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">73</span></td><td>11 - FISCAL MAINTENANCE</td><td><span class="name">Cost of Collections</span></td><td><span class="mono dim">w_ct_m_fscl_cost_of_collections</span></td><td>Low High</td><td>KH</td><td>DC</td><td class="num">5</td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7568" target="_blank" rel="noopener">VISAR-7568</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">93</span></td><td>15 - PERSON</td><td><span class="name">Attorney Maintenance</span></td><td><span class="mono dim">w_ct_m_attorney</span></td><td>Medium</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7569" target="_blank" rel="noopener">VISAR-7569</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">94</span></td><td>15 - PERSON</td><td><span class="name">Interpreters Maintenance</span></td><td><span class="mono dim">w_ct_m_interpreters</span></td><td>Low High</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7570" target="_blank" rel="noopener">VISAR-7570</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">94.1</span></td><td>15 - PERSON</td><td><span class="name">Interpreters in System</span></td><td><span class="mono dim">w_ct_r_interpreters_lookup</span></td><td>Low</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7571" target="_blank" rel="noopener">VISAR-7571</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">94.2</span></td><td>15 - PERSON</td><td><span class="name">Interpreter Remarks(Ctrl+Alt+T under Remarks)</span></td><td><span class="mono dim">w_ct_r_interpreter_remarks</span></td><td>Low</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7572" target="_blank" rel="noopener">VISAR-7572</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">95</span></td><td>15 - PERSON</td><td><span class="name">Multi-Person Maintenance</span></td><td><span class="mono dim">w_ct_m_multi_person_maint</span></td><td>Low High</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">SG8</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7573" target="_blank" rel="noopener">VISAR-7573</a></td><td><span class="tag tag-none">Planning</span></td><td><span class="mono">95.1</span></td><td>15 - PERSON</td><td><span class="name">Multi-Person Maintenance Datafix Report</span></td><td><span class="mono dim">w_ct_r_mpm_report</span></td><td>Low</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td></tr>
+<tr class="plan-active"><td><span class="dim">—</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7556" target="_blank" rel="noopener">VISAR-7556</a></td><td><span class="pill ok">Active</span></td><td><span class="mono">NEW</span></td><td>TABLES</td><td><span class="name">VNG Reports UI</span></td><td><span class="mono dim">w_ct_m_vng_reports</span></td><td>Low Medium</td><td>KH</td><td><span class="dim">—</span></td><td class="num">5</td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="completed">
+  <h2>Completed <span class="count">32</span></h2>
+  <p class="note">Delivered work (Jira Subtask Completed). Deployed is the Jira Deployment Date; Pre-Sprint means it shipped before sprint grouping began.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th><th>Started</th><th>Signed Off</th><th>Deployed</th><th>Build #</th><th class="num">QA Cycle</th><th class="num">Total Def</th><th>Defect Log</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-patch">Patch</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7428" target="_blank" rel="noopener">VISAR-7428</a></td><td><span class="mono">—</span></td><td><span class="name">Bail Schedule Watermark</span></td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td>2026-09-15</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-patch">Patch</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7397" target="_blank" rel="noopener">VISAR-7397</a></td><td><span class="mono">—</span></td><td><span class="name">Code Entries</span></td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td>2026-09-09</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-int">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7332" target="_blank" rel="noopener">VISAR-7332</a></td><td><span class="mono">2</span></td><td><span class="name">Date of Action Maintenance</span></td><td>CN</td><td>DC</td><td>2026-08-28</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">2</td><td class="num">2</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Date%20of%20Action.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6499" target="_blank" rel="noopener">VISAR-6499</a></td><td><span class="mono">6</span></td><td><span class="name">Purge Duplicates</span></td><td>SM</td><td>MU</td><td>2025-12-31</td><td>2026-08-21</td><td>2026-05-05</td><td>Build 5.02</td><td class="num">2</td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6475" target="_blank" rel="noopener">VISAR-6475</a></td><td><span class="mono">51</span></td><td><span class="name">Courtroom Setup</span></td><td>SM</td><td>BY</td><td>2025-12-23</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">7</td><td class="num">32</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Courtroom%20Setup.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6797" target="_blank" rel="noopener">VISAR-6797</a></td><td><span class="mono">60</span></td><td><span class="name">Case Payment History</span></td><td>NV</td><td>MU</td><td>2026-03-16</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">6</td><td class="num">28</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Case%20Payment%20History.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6895" target="_blank" rel="noopener">VISAR-6895</a></td><td><span class="mono">122</span></td><td><span class="name">Unlock Case</span></td><td>NV</td><td>BY</td><td>2026-04-21</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">2</td><td class="num">6</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Unlock%20Case%20-%20Case%20Lock%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6168" target="_blank" rel="noopener">VISAR-6168</a></td><td><span class="mono">125</span></td><td><span class="name">Bail Schedule</span></td><td>JL</td><td>MU</td><td>2025-09-16</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">3</td><td class="num">58</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Bail%20Schedule.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6168" target="_blank" rel="noopener">VISAR-6168</a></td><td><span class="mono">125.1</span></td><td><span class="name">Bail Schedule - Review</span></td><td>JL</td><td>MU</td><td>2025-09-16</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">3</td><td class="num">58</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Bail%20Schedule.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6190" target="_blank" rel="noopener">VISAR-6190</a></td><td><span class="mono">128</span></td><td><span class="name">Code Entry</span></td><td>NV</td><td>BY</td><td>2025-09-24</td><td>2026-08-21</td><td>2026-02-05</td><td>Build 5.01</td><td class="num">9</td><td class="num">99</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Code%20Entry.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6450" target="_blank" rel="noopener">VISAR-6450</a></td><td><span class="mono">129</span></td><td><span class="name">CodesXref Maintenance</span></td><td>JL</td><td>BY</td><td>2025-12-15</td><td>2026-08-21</td><td>2026-06-30</td><td>Build 5.03</td><td class="num">2</td><td class="num">11</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Codes%20XRef%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6274" target="_blank" rel="noopener">VISAR-6274</a></td><td><span class="mono">130</span></td><td><span class="name">Court Control</span></td><td>SM</td><td>MU</td><td>2025-10-23</td><td>2026-08-21</td><td>2026-05-05</td><td>Pre-release</td><td class="num">5</td><td class="num">46</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Court%20Control.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6167" target="_blank" rel="noopener">VISAR-6167</a></td><td><span class="mono">137</span></td><td><span class="name">Error Code</span></td><td>SM</td><td>MU</td><td>2025-09-16</td><td>2026-08-21</td><td>2026-02-05</td><td>Pre-release</td><td class="num">10</td><td class="num">58</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Error%20Codes.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6217" target="_blank" rel="noopener">VISAR-6217</a></td><td><span class="mono">138</span></td><td><span class="name">Event Codes</span></td><td>SM</td><td>MU</td><td>2025-10-06</td><td>2026-08-21</td><td>2026-02-05</td><td>Pre-release</td><td class="num">9</td><td class="num">43</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Event%20Codes.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6189" target="_blank" rel="noopener">VISAR-6189</a></td><td><span class="mono">141</span></td><td><span class="name">Job Error Log</span></td><td>SM</td><td>BY</td><td>2025-09-24</td><td>2026-08-21</td><td>2026-02-05</td><td>Pre-release</td><td class="num">5</td><td class="num">59</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Job%20Error%20Log.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6254" target="_blank" rel="noopener">VISAR-6254</a></td><td><span class="mono">144</span></td><td><span class="name">Parm Lookups</span></td><td>NV</td><td>BY</td><td>2025-10-20</td><td>2026-08-21</td><td>2026-05-05</td><td>Pre-release</td><td class="num">6</td><td class="num">45</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Parm%20Lookups.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6848" target="_blank" rel="noopener">VISAR-6848</a></td><td><span class="mono">145</span></td><td><span class="name">Sentence Workflow Maintanence</span></td><td>NV</td><td>CL</td><td>2026-04-03</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">4</td><td class="num"><span class="dim">—</span></td><td><span class="dim">—</span></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6316" target="_blank" rel="noopener">VISAR-6316</a></td><td><span class="mono">146</span></td><td><span class="name">SP Registry</span></td><td>NV</td><td>BY</td><td>2025-11-18</td><td>2026-08-21</td><td>2026-06-30</td><td>Pre-release2</td><td class="num">5</td><td class="num">39</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20SP%20Registry.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6544" target="_blank" rel="noopener">VISAR-6544</a></td><td><span class="mono">148</span></td><td><span class="name">Violation Agency X-Ref</span></td><td>NV</td><td>MU</td><td>2026-01-12</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">3</td><td class="num">15</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Violation%20Agency%20XRef.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">Pre-Sprint</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6474" target="_blank" rel="noopener">VISAR-6474</a></td><td><span class="mono">149</span></td><td><span class="name">Violations</span></td><td>NV</td><td>MU</td><td>2025-12-24</td><td>2026-08-21</td><td>2026-08-26</td><td>1.0</td><td class="num">5</td><td class="num">32</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Violations.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG1</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7012" target="_blank" rel="noopener">VISAR-7012</a></td><td><span class="mono">25</span></td><td><span class="name">Priors</span></td><td>JL</td><td>MU</td><td>2026-05-19</td><td>2026-09-29</td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">3</td><td class="num">59</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Priors.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG1</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7012" target="_blank" rel="noopener">VISAR-7012</a></td><td><span class="mono">25.1</span></td><td><span class="name">Print - Copies Spec.</span></td><td>JL</td><td>MU</td><td>2026-05-19</td><td>2026-09-29</td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">3</td><td class="num">59</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Priors.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG1</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7188" target="_blank" rel="noopener">VISAR-7188</a></td><td><span class="mono">55</span></td><td><span class="name">Exhibit List</span></td><td>JL</td><td>DC</td><td>2026-07-28</td><td>2026-09-29</td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">3</td><td class="num">30</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20List.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG1</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7188" target="_blank" rel="noopener">VISAR-7188</a></td><td><span class="mono">55.1</span></td><td><span class="name">Exhibit Search</span></td><td>JL</td><td>DC</td><td>2026-07-28</td><td>2026-09-29</td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">3</td><td class="num">30</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20List.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-int">SG1 Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7189" target="_blank" rel="noopener">VISAR-7189</a></td><td><span class="mono">56</span></td><td><span class="name">Exhibit Maintenance</span></td><td>SM</td><td>DC</td><td>2026-07-15</td><td><span class="dim">—</span></td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">11</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-int">SG1 Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7189" target="_blank" rel="noopener">VISAR-7189</a></td><td><span class="mono">56.1</span></td><td><span class="name">New Exhibit Hearing List</span></td><td>SM</td><td>DC</td><td>2026-07-15</td><td><span class="dim">—</span></td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">11</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-int">SG1 Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7185" target="_blank" rel="noopener">VISAR-7185</a></td><td><span class="mono">57</span></td><td><span class="name">Exhibit Management</span></td><td>NV</td><td>DC</td><td>2026-07-14</td><td><span class="dim">—</span></td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">20</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20Management.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-int">SG1 Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7206" target="_blank" rel="noopener">VISAR-7206</a></td><td><span class="mono">57.1</span></td><td><span class="name">Exhibit Management Search</span></td><td>NV</td><td>DC</td><td>2026-07-20</td><td><span class="dim">—</span></td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">20</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20Management.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG1</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7206" target="_blank" rel="noopener">VISAR-7206</a></td><td><span class="mono">57.2</span></td><td><span class="name">Exhibit History</span></td><td>NV</td><td>DC</td><td>2026-07-20</td><td>2026-09-29</td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">20</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20Management.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-int">SG1 Internal</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7206" target="_blank" rel="noopener">VISAR-7206</a></td><td><span class="mono">57.3</span></td><td><span class="name">Exhibit Disposition Notice</span></td><td>NV</td><td>DC</td><td>2026-07-20</td><td><span class="dim">—</span></td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">20</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Exhibit%20Management.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG1</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7215" target="_blank" rel="noopener">VISAR-7215</a></td><td><span class="mono">90</span></td><td><span class="name">JBSIS Maintenance</span></td><td>NV</td><td>DC</td><td>2026-07-21</td><td>2026-09-29</td><td>2026-10-08</td><td>Build 5.07 NG1.1</td><td class="num">2</td><td class="num">17</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20JBSIS%20Maintenance.xlsx" target="_blank" rel="noopener">log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7423" target="_blank" rel="noopener">VISAR-7423</a></td><td><span class="mono">9.2</span></td><td><span class="name">Web Browser of generated files</span></td><td>NV</td><td>CL</td><td>2026-09-15</td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td><span class="dim">—</span></td><td class="num">1</td><td class="num">0</td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/QA%20Defect%20Logs/QA%20Defect%20Log%20-%20Web%20Browser%20of%20generated%20files.xlsx" target="_blank" rel="noopener">log</a></td></tr></tbody>
+  </table></div>
+</section>
+
+<div class="savebar">
+  <button id="btnSave">Save notes</button>
+  <button id="btnClear" class="ghost">Clear all notes</button>
+  <span id="dirty" class="dirty"></span>
+  <span id="mode" class="savemode">checking save capability&hellip;</span>
+</div>
+
+<div class="framehint" id="framehint">
+  <b>Saving is blocked here.</b> SharePoint's preview frame will not let this page write a file &mdash;
+  no download, no save dialog. <a id="poplink" target="_blank" rel="noopener">Open the dashboard in its
+  own tab</a> and save from there; you will get a location picker. Your notes are kept in this browser,
+  so they will still be here when you come back.
+  <span class="fhrow">
+    <input id="popurl" readonly spellcheck="false">
+    <button id="popcopy">Copy address</button>
+    <span class="msg" id="popmsg"></span>
+  </span>
+</div>
+
+<div class="manual" id="manual">
+  <h3>Take your notes</h3>
+  <p>Save this as <b id="mname"></b> in the <b>NG Meeting Decisions</b> folder, then run a refresh.</p>
+  <textarea id="mtext" spellcheck="false" readonly></textarea>
+  <div class="row">
+    <button id="mcopy">Copy to clipboard</button>
+    <a id="mdl" class="dl" download>Download the file</a>
+    <span class="msg" id="mmsg"></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY = 'ng-notes-v1';
+  var nodes = function(){ return Array.prototype.slice.call(document.querySelectorAll('.note-in')); };
+  var dirty = false;
+  var elDirty = document.getElementById('dirty');
+  var elMode  = document.getElementById('mode');
+
+  // ---- how do we get the notes off this page? ----
+  // SharePoint renders this file inside a sandboxed frame, where a programmatic download is
+  // discarded WITHOUT throwing. The old code clicked a blob link and announced success either way,
+  // so notes vanished silently. Nothing below claims a save it cannot prove: either the file
+  // picker confirms a write, or the JSON goes on screen for the user to take by hand.
+  var framed  = (function(){ try { return window.self !== window.top; } catch(e) { return true; } })();
+  var canPick = typeof window.showSaveFilePicker === 'function' && !framed;
+  elMode.innerHTML = canPick
+    ? 'Save mode: <b>direct</b> &mdash; you will be asked where to put the file. Choose <b>NG Meeting Decisions</b>.'
+    : 'Save mode: <b>copy</b> &mdash; this page cannot write files from here, so Save hands you the text.';
+
+  // ---- SharePoint's preview frame blocks every route to a file ----
+  // showSaveFilePicker throws SecurityError cross-origin, a synthetic download click is discarded,
+  // and a blob: URL minted in here carries an opaque origin so the browser refuses to open it at
+  // all ("this link can't be opened"). None of that is fixable from inside; the only cure is to
+  // leave the frame, so say so and hand over the address.
+  var elHint = document.getElementById('framehint');
+  if (framed) {
+    var SELF = "https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20Project%20Dashboard.html";
+    document.getElementById('poplink').href = SELF;
+    document.getElementById('popurl').value = SELF;
+    elHint.className = 'framehint on';
+    document.getElementById('popcopy').addEventListener('click', function(){
+      var u = document.getElementById('popurl');
+      u.focus(); u.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch(e) {}
+      document.getElementById('popmsg').textContent = ok
+        ? 'Address copied - paste it into a new tab.'
+        : 'Selected - press Ctrl+C, then paste into a new tab.';
+    });
+  }
+
+  function autosize(t){ t.style.height='auto'; t.style.height=Math.min(t.scrollHeight,160)+'px'; }
+  function markDirty(){ dirty = true; elDirty.textContent = '\u25CF unsaved'; }
+
+  // ---- best-effort local persistence; never relied upon ----
+  function stash(){
+    try {
+      var o = {};
+      nodes().forEach(function(t){ if (t.value.trim()) o[t.dataset.id] = t.value; });
+      localStorage.setItem(KEY, JSON.stringify(o));
+    } catch(e) {}
+  }
+  function restore(){
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY) || '{}');
+      nodes().forEach(function(t){ if (!t.value && o[t.dataset.id]) t.value = o[t.dataset.id]; });
+    } catch(e) {}
+  }
+
+  function payload(){
+    var out = [];
+    nodes().forEach(function(t){
+      var v = t.value.trim();
+      if (!v) return;
+      out.push({ id:t.dataset.id, w:t.dataset.w, subtask:t.dataset.key,
+                 window:t.dataset.name, section:t.dataset.section, note:v });
+    });
+    return { generated:new Date().toISOString(), dashboardDate:"2026-10-27", notes:out };
+  }
+
+  function fname(){
+    var d = new Date(), p = function(n){ return String(n).padStart(2,'0'); };
+    return 'ng-decisions-' + d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + '.json';
+  }
+
+  var elManual = document.getElementById('manual');
+  var elText   = document.getElementById('mtext');
+  var elName   = document.getElementById('mname');
+  var elMsg    = document.getElementById('mmsg');
+  var elDl     = document.getElementById('mdl');
+
+  document.getElementById('btnSave').addEventListener('click', async function(){
+    var data = payload();
+    if (!data.notes.length) { elMode.innerHTML = '<b>Nothing to save</b> &mdash; no notes entered.'; return; }
+    var text = JSON.stringify(data, null, 2);
+    var name = fname();
+
+    if (canPick) {
+      try {
+        var h = await window.showSaveFilePicker({ suggestedName:name,
+          types:[{description:'NG decisions', accept:{'application/json':['.json']}}] });
+        var w = await h.createWritable(); await w.write(text); await w.close();
+        dirty = false; elDirty.textContent = '';
+        elManual.className = 'manual';
+        elMode.innerHTML = 'Saved <b>' + data.notes.length + '</b> note(s) directly. Save mode: <b>direct</b>.';
+        stash(); return;
+      } catch(err) {
+        if (err && err.name === 'AbortError') return;           // user cancelled
+      }
+    }
+
+    // Everything else: put the text in front of the user. A download link is offered too, but the
+    // user clicks it -- a click we synthesise ourselves is the exact thing the frame throws away.
+    // dirty stays set on purpose: nothing has left the page yet.
+    elText.value = text;
+    elName.textContent = name;
+    elMsg.textContent = '';
+    // Only offer the download where it can actually run. Inside the frame the blob: URL is born
+    // with an opaque origin and the browser refuses it, which is worse than not offering it.
+    if (framed) {
+      elDl.style.display = 'none';
+    } else {
+      elDl.style.display = '';
+      elDl.href = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+      elDl.download = name;
+    }
+    elManual.className = 'manual on';
+    elText.focus(); elText.select();
+    elMode.innerHTML = '<b>' + data.notes.length + '</b> note(s) ready below &mdash; nothing is saved until you copy or download them.';
+    stash();
+  });
+
+  document.getElementById('mcopy').addEventListener('click', function(){
+    elText.focus(); elText.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e) {}
+    if (ok) { elMsg.textContent = 'Copied. Paste it into a new .json file in NG Meeting Decisions.'; return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(elText.value).then(function(){
+        elMsg.textContent = 'Copied. Paste it into a new .json file in NG Meeting Decisions.';
+      }, function(){
+        elMsg.textContent = 'Copy was blocked. The text is selected - press Ctrl+C.';
+      });
+      return;
+    }
+    elMsg.textContent = 'Copy was blocked. The text is selected - press Ctrl+C.';
+  });
+
+  document.getElementById('btnClear').addEventListener('click', function(){
+    if (!confirm('Clear every note on this page?')) return;
+    nodes().forEach(function(t){ t.value=''; autosize(t); });
+    try { localStorage.removeItem(KEY); } catch(e) {}
+    dirty = false; elDirty.textContent = '';
+  });
+
+  nodes().forEach(function(t){
+    autosize(t);
+    t.addEventListener('input', function(){ autosize(t); markDirty(); stash(); });
+  });
+  restore();
+  nodes().forEach(autosize);
+
+  window.addEventListener('beforeunload', function(e){
+    if (!dirty) return;
+    e.preventDefault(); e.returnValue = '';
+  });
+})();
+</script>
+
+<footer>
+  Generated from <b>Vision NG - Master Tracking.xlsx</b>. Status, dates and QA cycle are derived from Jira
+  subtask history; defect counts from the QA Defect Logs folder.
+  <b>UAT Start</b> and <b>Signed Off</b> come from the UAT Release and Sign-Off dates in the UAT Defect Log.
+  <b>UAT fix pending</b> counts open QA-log defects that came from UAT; in UAT Mitigation, the green &#9650; is how many
+  UAT defects were added since UAT Start and the red &#9660; how many of those have since been closed.
+  <b>UAT Mitigation</b> lists every window with an open UAT subtask, or with UAT defects at Fix In-Progress and none yet.
+  Windows sharing a bundled subtask repeat that subtask's dates and defect totals &mdash; do not sum the defect columns.
+</footer>
+</div><script>
+(function(){
+  var el = document.getElementById("stale"), rt = document.getElementById("reftime");
+  if (!el || !rt) return;
+  var gen = new Date(rt.getAttribute("data-gen"));
+  if (isNaN(gen)) return;
+  var hrs = (Date.now() - gen) / 3600000;
+  var WARN = 18, BAD = 30;   // schedule is 4x per weekday; >18h means a run was missed
+  if (hrs < WARN) return;
+  var age = hrs < 48 ? Math.round(hrs) + " hours" : Math.round(hrs/24) + " days";
+  el.className = "stale" + (hrs < BAD ? " warn" : "");
+  el.textContent = (hrs < BAD ? "⚠ " : "⛔ ")
+    + "This page is " + age + " old. The automatic refresh has not run. "
+    + "Run “Refresh NG Dashboard” from the shared folder to bring it up to date.";
+  el.hidden = false;
+})();
+</script>
+</body></html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vision NG PDC Dashboard</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#fff; --ink:#15181d; --dim:#6b7280; --line:#e3e6ea;
+  --accent:#1f3864; --ok:#137333; --warn:#b3261e; --soon:#8a6100;
+  --user:#1f3864; --int:#6d28d9; --none:#6b7280;
+}
+@media (prefers-color-scheme:dark){ :root{
+  --bg:#0f1115; --panel:#171a20; --ink:#e7e9ee; --dim:#9aa3b2; --line:#272c35;
+  --accent:#9db8e8; --ok:#5dd47f; --warn:#ff8b80; --soon:#e5b567;
+  --user:#9db8e8; --int:#c4b5fd; --none:#9aa3b2;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+.wrap{max-width:1500px;margin:0 auto;padding:28px 16px 64px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+h1{font-size:24px;margin:0;letter-spacing:-.2px}
+.ref{color:var(--dim);font-size:12.5px}
+.sub{color:var(--dim);font-size:13px;margin:0 0 20px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px}
+nav a{background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 13px;
+  text-decoration:none;color:var(--ink);font-size:13px}
+nav a:hover{border-color:var(--accent)}
+nav b{background:var(--accent);color:var(--panel);border-radius:99px;font-size:11px;padding:0 7px;margin-left:5px}
+section{margin:0 0 34px}
+h2{font-size:16.5px;margin:0 0 3px;display:flex;align-items:center;gap:9px}
+.count{background:var(--accent);color:var(--panel);border-radius:99px;font-size:11.5px;
+  padding:1px 9px;font-weight:700}
+.note{color:var(--dim);font-size:12.5px;margin:0 0 11px}
+/* instructions the PDC must act on, set apart from the descriptive notes */
+.todo{margin:6px 0 12px;padding:10px 14px;font-size:15px;font-weight:600;line-height:1.4;
+  border:1px solid var(--soon);border-left-width:5px;border-radius:8px;
+  background:color-mix(in srgb,var(--soon) 10%,var(--panel))}
+.todo b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--soon);margin-bottom:2px}
+.tw{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+th{background:var(--bg);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--dim);position:sticky;top:0;z-index:1}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+td.num,th.num{text-align:right}
+.name{white-space:normal;min-width:180px;display:inline-block}
+a{color:var(--accent)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px}
+.dim{color:var(--dim)}
+.ok{color:var(--ok)} .warn{color:var(--warn)}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11.5px;font-weight:600;
+  border:1px solid currentColor}
+.tag-user{color:var(--user)} .tag-int{color:var(--int)}
+.tag-none{color:var(--none);font-weight:400;font-style:italic}
+.pill{display:inline-block;padding:0 7px;border-radius:99px;font-size:11px;font-weight:700;
+  border:1px solid currentColor;margin-left:5px}
+.pill.ok{color:var(--ok)} .pill.late{color:var(--warn)} .pill.soon{color:var(--soon)}
+.nowrap{white-space:nowrap}
+.mv{font-size:12px;font-weight:700;margin-left:4px;cursor:help}
+.mv.up{color:var(--ok)} .mv.dn{color:var(--warn)} .mv.zero{opacity:.35}
+.empty{color:var(--dim);text-align:center;padding:20px}
+footer{color:var(--dim);font-size:12px;border-top:1px solid var(--line);padding-top:14px;margin-top:34px}
+.stale{margin-top:8px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:600;background:#5c4a18;color:#ffeccc;border:1px solid #8c7127}
+@media print{body{background:#fff}nav{display:none}.tw{border:0}th{position:static}}
+</style></head>
+<body><div class="wrap">
+<header>
+  <h1>Vision NG PDC Dashboard</h1>
+  <div class="ref" id="reftime" data-gen="2026-10-27T16:31:53.667Z">Last built Tuesday, October 27, 2026 at 9:31 AM PT</div>
+  <div id="stale" class="stale" hidden></div>
+</header>
+<p class="sub">Project Delivery Coordinator view: windows heading to UAT, in UAT, returned from UAT and signed off. Built from the last NG Dashboard refresh.</p>
+
+<nav><a href="#twoweek">2 Week Heads Up<b>2</b></a><a href="#oneweek">1 Week Planning<b>0</b></a><a href="#inuat">In UAT<b>6</b></a><a href="#returned">UAT Returned<b>4</b></a><a href="#signed">Signed Off<b>0</b></a></nav>
+
+<section id="twoweek">
+  <h2>2 Week Heads Up <span class="count">2</span></h2>
+  <p class="note">Committed Delivery windows, from the first Monday after the two-week timer started. Target Date to UAT is that Monday + 14 days.</p>
+  
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Target Date to UAT</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7427" target="_blank" rel="noopener">VISAR-7427</a></td><td><span class="mono">14</span></td><td><span title="Heads up Mon 2026-10-26; 2 Week Start 2026-10-22">2026-11-09</span> <span class="pill ok">D-13</span></td><td><span class="name">Notice of Packaged Hearings</span></td><td>CN</td><td>CL</td></tr>
+<tr><td><span class="tag tag-user">SG3</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7445" target="_blank" rel="noopener">VISAR-7445</a></td><td><span class="mono">104</span></td><td><span title="Heads up Mon 2026-10-26; 2 Week Start 2026-10-22">2026-11-09</span> <span class="pill ok">D-13</span></td><td><span class="name">Case File Purge</span></td><td>SM</td><td>BY</td></tr></tbody>
+  </table></div>
+</section>
+<section id="oneweek">
+  <h2>1 Week Planning <span class="count">0</span></h2>
+  
+  <div class="todo"><b>PDC action</b>Windows coming to UAT in 1 week or less. Please start planning the UAT and add the first UAT date in the UAT log under UAT Release.</div>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Target Date to UAT</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th></tr></thead>
+    <tbody><tr><td colspan="7" class="empty">No windows in this section.</td></tr></tbody>
+  </table></div>
+</section>
+<section id="inuat">
+  <h2>In UAT <span class="count">6</span></h2>
+  <p class="note">User-facing work in UAT. Days in UAT counts from UAT Start: amber at 7 days, red at 14. UAT State: Fix Pending = also in UAT Returned; Not Started = no UAT Start yet; In Progress = testing, nothing back with Dev.</p>
+  
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>To UAT</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th><th>UAT Start</th><th class="num">Days in UAT</th><th>UAT State</th><th>UAT Log</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7421" target="_blank" rel="noopener">VISAR-7421</a></td><td><span class="mono">9</span></td><td>2026-10-23 <span class="pill ok">3d early</span></td><td><span class="name">Calendar Report</span></td><td>NV</td><td>CL</td><td><span class="dim">not started</span></td><td class="num"><span class="dim">not started</span></td><td><span class="tag tag-none">Not Started</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7422" target="_blank" rel="noopener">VISAR-7422</a></td><td><span class="mono">9.1</span></td><td>2026-10-23 <span class="pill ok">3d early</span></td><td><span class="name">Calendar Batch Print</span></td><td>NV</td><td>CL</td><td><span class="dim">not started</span></td><td class="num"><span class="dim">not started</span></td><td><span class="tag tag-none">Not Started</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7401" target="_blank" rel="noopener">VISAR-7401</a></td><td><span class="mono">10</span></td><td>2026-10-02 <span class="pill ok">11d early</span></td><td><span class="name">Calendar Transfer</span></td><td>CN</td><td>DC</td><td>2026-10-19</td><td class="num"><span class="pill soon">8d</span></td><td><span class="pill late" title="Also listed in UAT Returned: a fix is owed to UAT">Fix Pending</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7426" target="_blank" rel="noopener">VISAR-7426</a></td><td><span class="mono">13</span></td><td>2026-10-08 <span class="pill ok">12d early</span></td><td><span class="name">Court Trial Transfer</span></td><td>CN</td><td>DC</td><td>2026-10-19</td><td class="num"><span class="pill soon">8d</span></td><td><span class="pill late" title="Also listed in UAT Returned: a fix is owed to UAT">Fix Pending</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6315" target="_blank" rel="noopener">VISAR-6315</a></td><td><span class="mono">53</span></td><td>2026-07-16 <span class="pill ok">78d early</span></td><td><span class="name">Minutes</span></td><td>SM</td><td>BY</td><td>2026-10-06</td><td class="num"><span class="pill late">21d</span></td><td><span class="pill late" title="Also listed in UAT Returned: a fix is owed to UAT">Fix Pending</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-6315" target="_blank" rel="noopener">VISAR-6315</a></td><td><span class="mono">53.3</span></td><td>2026-07-16 <span class="pill ok">78d early</span></td><td><span class="name">VCJIS - Court Reports Preview</span></td><td>SM</td><td>BY</td><td>2026-10-06</td><td class="num"><span class="pill late">21d</span></td><td><span class="pill late" title="Also listed in UAT Returned: a fix is owed to UAT">Fix Pending</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr></tbody>
+  </table></div>
+</section>
+<section id="returned">
+  <h2>UAT Returned <span class="count">4</span></h2>
+  <p class="note">These windows have UAT defects. Will be removed once all defects are addressed. Dev fixes, BSA runs QA, then the PDC confirms with the SMEs and closes the UAT subtask.</p>
+  <div class="todo"><b>PDC action</b>PDC Review indicates there is a defect in the UAT defect log that has been addressed by Vision and needs review for Clearing and retest. Please validate the fix and update the UAT defect log. If all UAT defects are addressed, Please close the UAT Subtask.</div>
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>UAT Subtask</th><th>W#</th><th>UAT Start</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th><th>Open UAT Def</th><th>Fix Status</th><th>UAT Log</th></tr></thead>
+    <tbody><tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7545" target="_blank" rel="noopener">VISAR-7545</a></td><td><span class="mono">10</span></td><td>2026-10-19</td><td><span class="name">Calendar Transfer</span></td><td>CN</td><td>DC</td><td><span class="nowrap"><b class="warn">1</b> <span class="mv up" title="UAT Defect Log since UAT Start 2026-10-19: 1 defect(s) reported, 0 closed">&#9650;1</span> <span class="mv zero" title="UAT Defect Log since UAT Start 2026-10-19: 1 defect(s) reported, 0 closed">&#9660;0</span></span></td><td><span class="pill ok" title="QA copy VISAR-7558 is Subtask Completed; no open defects in the QA defect log">PDC Review</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7582" target="_blank" rel="noopener">VISAR-7582</a></td><td><span class="mono">13</span></td><td>2026-10-19</td><td><span class="name">Court Trial Transfer</span></td><td>CN</td><td>DC</td><td><span class="nowrap"><b class="warn">1</b> <span class="mv up" title="UAT Defect Log since UAT Start 2026-10-19: 1 defect(s) reported, 0 closed">&#9650;1</span> <span class="mv zero" title="UAT Defect Log since UAT Start 2026-10-19: 1 defect(s) reported, 0 closed">&#9660;0</span></span></td><td><span class="pill soon" title="not yet in QA">Fixing</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7498" target="_blank" rel="noopener">VISAR-7498</a></td><td><span class="mono">53</span></td><td>2026-10-06</td><td><span class="name">Minutes</span></td><td>SM</td><td>BY</td><td><span class="nowrap"><b class="warn">3</b> <span class="mv up" title="UAT Defect Log since UAT Start 2026-10-06: 14 defect(s) reported, 11 closed">&#9650;14</span> <span class="mv dn" title="UAT Defect Log since UAT Start 2026-10-06: 14 defect(s) reported, 11 closed">&#9660;11</span></span></td><td><span class="pill soon" title="1 open defect(s) in the QA defect log">Fixing</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr>
+<tr><td><span class="tag tag-user">SG2</span></td><td><a href="https://ocsuperiorcourt.atlassian.net/browse/VISAR-7498" target="_blank" rel="noopener">VISAR-7498</a></td><td><span class="mono">53.3</span></td><td>2026-10-06</td><td><span class="name">VCJIS - Court Reports Preview</span></td><td>SM</td><td>BY</td><td><span class="nowrap"><b class="warn">3</b> <span class="mv up" title="UAT Defect Log since UAT Start 2026-10-06: 14 defect(s) reported, 11 closed">&#9650;14</span> <span class="mv dn" title="UAT Defect Log since UAT Start 2026-10-06: 14 defect(s) reported, 11 closed">&#9660;11</span></span></td><td><span class="pill soon" title="1 open defect(s) in the QA defect log">Fixing</span></td><td><a href="https://occourts.sharepoint.com/sites/Vision_ILJ/General%20Documentation/Knowledge%20Sharing%20Documents/Vision%20Team%20Knowledge/Vision%20NG%20-%20Grouping/Vision%20NG%20-%20UAT%20Defect%20Log.xlsx" target="_blank" rel="noopener">UAT log</a></td></tr></tbody>
+  </table></div>
+</section>
+<section id="signed">
+  <h2>Signed Off <span class="count">0</span></h2>
+  <p class="note">Signed off in UAT and waiting to deploy. Drops off once deployed.</p>
+  
+  <div class="tw"><table>
+    <thead><tr><th>Sprint #</th><th>Subtask</th><th>W#</th><th>Window / Subscreen Name</th><th>Dev</th><th>BSA</th><th>UAT Start</th><th>Signed Off</th></tr></thead>
+    <tbody><tr><td colspan="8" class="empty">No windows in this section.</td></tr></tbody>
+  </table></div>
+</section>
+
+<footer>
+  <b>Target Date to UAT</b> here is the PDC's date: the first Monday on or after the window's 2 Week Start, plus 14 days.
+  It can differ from the Target Date on the project dashboard, which is 2 Week Start + 14 days. Hover a target to see both dates.
+  <b>To UAT</b> is measured against the project dashboard's Target Date. <b>UAT Start</b> and <b>Signed Off</b> come from the UAT Defect Log.
+  In UAT Returned, <b>Open UAT Def</b> counts defects in the UAT Defect Log not yet Resolved or No Action (Returned to UAT still counts);
+  the green &#9650; is UAT defects reported since UAT Start and the red &#9660; those since closed.
+</footer>
+</div><script>
+(function(){
+  var el = document.getElementById("stale"), rt = document.getElementById("reftime");
+  var gen = new Date(rt.getAttribute("data-gen"));
+  if (isNaN(gen)) return;
+  var hrs = (Date.now() - gen) / 3600000;
+  if (hrs < 24) return;
+  el.textContent = "\u26A0 This page is " + (hrs < 48 ? Math.round(hrs) + " hours" : Math.round(hrs/24) + " days")
+    + " old. Run a dashboard refresh to bring it up to date.";
+  el.hidden = false;
+})();
+</script>
+</body></html>

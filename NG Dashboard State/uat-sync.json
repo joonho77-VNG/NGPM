@@ -1,0 +1,130 @@
+{
+ "jbsismaintenance#1": {
+  "window": "JBSIS MAINTENANCE",
+  "uatId": "1",
+  "qaFile": "QA Defect Log - JBSIS Maintenance.xlsx",
+  "qaId": null,
+  "by": "manual",
+  "date": "2026-09-22"
+ },
+ "jbsismaintenance#2": {
+  "window": "JBSIS MAINTENANCE",
+  "uatId": "2",
+  "qaFile": "QA Defect Log - JBSIS Maintenance.xlsx",
+  "qaId": null,
+  "by": "manual",
+  "date": "2026-09-22"
+ },
+ "jbsismaintenance#3": {
+  "window": "JBSIS MAINTENANCE",
+  "uatId": "3",
+  "qaFile": "QA Defect Log - JBSIS Maintenance.xlsx",
+  "qaId": null,
+  "by": "manual",
+  "date": "2026-09-22"
+ },
+ "priors#1": {
+  "window": "PRIORS",
+  "uatId": "1",
+  "qaFile": "QA Defect Log - Priors.xlsx",
+  "qaId": 58,
+  "by": "sync",
+  "date": "2026-09-22"
+ },
+ "priors#2": {
+  "window": "PRIORS",
+  "uatId": "2",
+  "qaFile": "QA Defect Log - Priors.xlsx",
+  "qaId": 59,
+  "by": "sync",
+  "date": "2026-09-22"
+ },
+ "priors#3": {
+  "window": "PRIORS",
+  "uatId": "3",
+  "qaFile": "QA Defect Log - Priors.xlsx",
+  "qaId": 60,
+  "by": "sync",
+  "date": "2026-09-22"
+ },
+ "jbsismaintenance#4": {
+  "window": "JBSIS MAINTENANCE",
+  "uatId": "4",
+  "qaFile": "QA Defect Log - JBSIS Maintenance.xlsx",
+  "qaId": 17,
+  "by": "sync",
+  "date": "2026-09-24"
+ },
+ "minutes#1": {
+  "window": "MINUTES",
+  "uatId": "1",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 136,
+  "by": "sync",
+  "date": "2026-10-06"
+ },
+ "minutes#3": {
+  "window": "MINUTES",
+  "uatId": "3",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 137,
+  "by": "sync",
+  "date": "2026-10-06"
+ },
+ "minutes#4": {
+  "window": "MINUTES",
+  "uatId": "4",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 138,
+  "by": "sync",
+  "date": "2026-10-06"
+ },
+ "minutes#8": {
+  "window": "MINUTES",
+  "uatId": "8",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 139,
+  "by": "sync",
+  "date": "2026-10-06"
+ },
+ "minutes#5": {
+  "window": "MINUTES",
+  "uatId": "5",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 140,
+  "by": "sync",
+  "date": "2026-10-07"
+ },
+ "minutes#10": {
+  "window": "MINUTES",
+  "uatId": "10",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 141,
+  "by": "sync",
+  "date": "2026-10-09"
+ },
+ "calendartransfer#1": {
+  "window": "CALENDAR TRANSFER",
+  "uatId": "1",
+  "qaFile": "QA Defect Log - Calendar Transfer.xlsx",
+  "qaId": 13,
+  "by": "sync",
+  "date": "2026-10-19"
+ },
+ "courttrialtransfer#1": {
+  "window": "COURT TRIAL TRANSFER",
+  "uatId": "1",
+  "qaFile": "QA Defect Log - Court Trial Transfer.xlsx",
+  "qaId": 17,
+  "by": "sync",
+  "date": "2026-10-26"
+ },
+ "minutes#13": {
+  "window": "MINUTES",
+  "uatId": "13",
+  "qaFile": "QA Defect Log - Minutes.xlsx",
+  "qaId": 144,
+  "by": "sync",
+  "date": "2026-10-27"
+ }
+}

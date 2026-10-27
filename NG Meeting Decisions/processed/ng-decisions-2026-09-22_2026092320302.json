@@ -1,0 +1,22 @@
+{
+  "generated": "2026-09-22T17:43:46.965Z",
+  "dashboardDate": "2026-09-22",
+  "notes": [
+    {
+      "id": "W53",
+      "w": "53",
+      "subtask": "VISAR-6315",
+      "window": "Minutes",
+      "section": "Committed Delivery Windows (Timer On)",
+      "note": "make this SG2"
+    },
+    {
+      "id": "W53.3",
+      "w": "53.3",
+      "subtask": "VISAR-6315",
+      "window": "VCJIS - Court Reports Preview",
+      "section": "Committed Delivery Windows (Timer On)",
+      "note": "make this SG2"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+﻿# dependencies / per-PC state (rebuilt by the scripts)
+node_modules/
+.ng-pm/
+
+# Office/Excel lock + temp files
+~$*
+*.tmp
+*.log
+
+# live run lock
+NG Dashboard State/run.lock
+
+# secrets - never commit
+.env
+.env.*
+*.pem
+*.key
+*token*
+*secret*
+*credential*
+
+# local-only Claude settings
+.claude/settings.local.json
+
+desktop.ini

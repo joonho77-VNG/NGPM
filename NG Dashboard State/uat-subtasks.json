@@ -1,0 +1,129 @@
+{
+ "priors#1": {
+  "devKey": "VISAR-7012",
+  "uatKey": "VISAR-7457",
+  "linked": "2026-09-23",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-23"
+ },
+ "priors#2": {
+  "devKey": "VISAR-7012",
+  "uatKey": "VISAR-7457",
+  "linked": "2026-09-23",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-23"
+ },
+ "priors#3": {
+  "devKey": "VISAR-7012",
+  "uatKey": "VISAR-7457",
+  "linked": "2026-09-23",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-23"
+ },
+ "jbsismaintenance#1": {
+  "devKey": "VISAR-7215",
+  "uatKey": "VISAR-7458",
+  "linked": "2026-09-23",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-23"
+ },
+ "jbsismaintenance#2": {
+  "devKey": "VISAR-7215",
+  "uatKey": "VISAR-7458",
+  "linked": "2026-09-23",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-23"
+ },
+ "jbsismaintenance#3": {
+  "devKey": "VISAR-7215",
+  "uatKey": "VISAR-7458",
+  "linked": "2026-09-23",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-23"
+ },
+ "jbsismaintenance#4": {
+  "devKey": "VISAR-7215",
+  "uatKey": "VISAR-7468",
+  "linked": "2026-09-24",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-09-28"
+ },
+ "minutes#1": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-06",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-10-08"
+ },
+ "minutes#3": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-06",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-10-08"
+ },
+ "minutes#4": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-06",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-10-08"
+ },
+ "minutes#8": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-06",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-10-08"
+ },
+ "minutes#5": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-07",
+  "state": "clear",
+  "by": "comment",
+  "seen": "2026-10-08"
+ },
+ "minutes#10": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-09",
+  "state": "clear",
+  "by": "comment",
+  "seen": "2026-10-26"
+ },
+ "calendartransfer#1": {
+  "devKey": "VISAR-7401",
+  "uatKey": "VISAR-7545",
+  "linked": "2026-10-19",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-10-27"
+ },
+ "courttrialtransfer#1": {
+  "devKey": "VISAR-7426",
+  "uatKey": "VISAR-7582",
+  "linked": "2026-10-26",
+  "state": "clear",
+  "by": "create",
+  "seen": "2026-10-27"
+ },
+ "minutes#13": {
+  "devKey": "VISAR-6315",
+  "uatKey": "VISAR-7498",
+  "linked": "2026-10-27",
+  "state": "push",
+  "by": "comment"
+ }
+}
